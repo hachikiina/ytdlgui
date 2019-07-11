@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ytdlgui"
         mc:Ignorable="d"
-        Title="Dodgy YouTube MP3 Converter" Height="183.667" Width="330" ResizeMode="NoResize">
+        Title="Dodgy YouTube MP3 Converter" Height="193.667" Width="330" ResizeMode="NoResize">
     <Grid>
         <TextBox x:Name="urlBox" Margin="10,16,0,0" Height="25" TextWrapping="Wrap" Text="Enter the url here..." VerticalAlignment="Top" HorizontalAlignment="Left" Width="292"/>
         <Button x:Name="urlFetch" Content="Fetch" Height="25" Margin="10,46,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="292"/>
@@ -14,8 +14,7 @@
             <CheckBox x:Name="correctbox" Content="Correct URL" IsEnabled="False" Height="18"/>
             <CheckBox x:Name="playlistbox" Content="Playlist" IsEnabled="False"/>
         </StackPanel>
-        <!--<Button x:Name="cmdBtn" Content="cmd" HorizontalAlignment="Left" Margin="177,96,0,0" VerticalAlignment="Top" Width="75" Height="25"/>-->
-        <!--<TextBox x:Name="cmdOutput" HorizontalAlignment="Left" Height="23" Margin="10,139,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="304"/>-->
+        <Label x:Name="cmdOutput" Content="Enter a YouTube URL to begin." HorizontalAlignment="Left" Margin="10,133,0,0" VerticalAlignment="Top" Height="31" Width="304" FontSize="9"/>
 
     </Grid>
 </Window>

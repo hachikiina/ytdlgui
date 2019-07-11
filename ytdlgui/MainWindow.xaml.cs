@@ -14,6 +14,8 @@ namespace ytdlgui
     public partial class MainWindow : Window
     {
         private string Placeholder = "Enter the url here...";
+        string trial = "";
+        bool playlist = false;
 
         public MainWindow()
         {
@@ -26,7 +28,6 @@ namespace ytdlgui
             urlBox.TextChanged += CheckPL;
 
             urlFetch.Click += RegexUrl;
-            //cmdBtn.Click += CmdStuff;
         }
 
         
@@ -50,56 +51,88 @@ namespace ytdlgui
         }
 
         //                                                          //i thought that it would work. it works but cant give the output to an element
-        //public void CmdStuff(object sender, EventArgs args)
-        //{
-        //    ProcessStartInfo cmdStartInfo = new ProcessStartInfo();
-        //    cmdStartInfo.FileName = @"C:\Windows\System32\cmd.exe";
-        //    cmdStartInfo.RedirectStandardOutput = true;
-        //    cmdStartInfo.RedirectStandardError = true;
-        //    cmdStartInfo.RedirectStandardInput = true;
-        //    cmdStartInfo.UseShellExecute = false;
-        //    cmdStartInfo.CreateNoWindow = true;
+        public void CmdStuff(string videoID, bool pl)
+        {
+            cmdOutput.Content = "Processing...";
 
-        //    Process cmdProcess = new Process();
-        //    cmdProcess.StartInfo = cmdStartInfo;
-        //    cmdProcess.ErrorDataReceived += cmd_Error;
-        //    cmdProcess.OutputDataReceived += cmd_DataReceived;
-        //    cmdProcess.EnableRaisingEvents = true;
-        //    cmdProcess.Start();
-        //    cmdProcess.BeginOutputReadLine();
-        //    cmdProcess.BeginErrorReadLine();
+            ProcessStartInfo cmdStartInfo = new ProcessStartInfo();
+            cmdStartInfo.FileName = @"C:\Windows\System32\cmd.exe";
+            cmdStartInfo.RedirectStandardOutput = true;
+            cmdStartInfo.RedirectStandardError = true;
+            cmdStartInfo.RedirectStandardInput = true;
+            cmdStartInfo.UseShellExecute = false;
+            cmdStartInfo.CreateNoWindow = true;
 
-        //    cmdProcess.StandardInput.WriteLine("ping www.bing.com");     //Execute ping bing.com
-        //    cmdProcess.StandardInput.WriteLine("exit");                  //Execute exit.
+            Process cmdProcess = new Process();
+            cmdProcess.StartInfo = cmdStartInfo;
+            cmdProcess.ErrorDataReceived += cmd_Error;
+            cmdProcess.OutputDataReceived += cmd_DataReceived;
+            cmdProcess.EnableRaisingEvents = true;
+            cmdProcess.Start();
+            cmdProcess.BeginOutputReadLine();
+            cmdProcess.BeginErrorReadLine();
 
-        //    cmdProcess.WaitForExit();
+            if (pl == true)
+            {
+                cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --geo-bypass --extract-audio --audio-format mp3 --audio-quality 0 --embed-thumbnail --no-mtime --prefer-ffmpeg {videoID}");
+            }
+            else if (pl == false)
+            {
+                cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --geo-bypass --no-playlist --extract-audio --audio-format mp3 --audio-quality 0 --embed-thumbnail --no-mtime --prefer-ffmpeg {videoID}");
+            }
 
-        //    void cmd_DataReceived(object sender1, DataReceivedEventArgs e)
-        //    {
-        //        if (e.Data.Contains("exit"))
-        //        {
-        //            MessageBox.Show("done");
-        //        }
-        //        else if (e.Data == null)
-        //        {
+            void cmd_DataReceived(object sender1, DataReceivedEventArgs e)
+            {
 
-        //        }
-        //        else
-        //        {
-        //            //gay
-        //        }
-        //    }
+                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    trial = e.Data;
+                    if (trial == null)
+                    {
+                        trial = "";
+                    }
+                    else
+                    {
+                        if (trial.ToLower().Contains("adding thumbnail to"))
+                        {
+                            cmdOutput.Content = "Done!";
+                        }
+                        else if (trial.Contains("webpage"))
+                        {
+                            cmdOutput.Content = "Getting information...";
+                        }
+                        else if (trial.ToLower().Contains("download") == true && trial.ToLower().Contains("downloading") == false)
+                        {
+                            cmdOutput.Content = "Downloading...";
+                        }
+                        else if (trial.ToLower().Contains("download") == false && trial.ToLower().Contains("downloading") == true)
+                        {
+                            
+                        }
+                        else if (trial.ToLower().Contains("destination:") && trial.ToLower().Contains(".mp3"))
+                        {
+                            cmdOutput.Content = "Converting...";
+                        }
+                    }
+                }));
+            }
 
-        //    void cmd_Error(object sender2, DataReceivedEventArgs e)
-        //    {
-        //        MessageBox.Show(e.Data);
-        //    }
-        //}
-
-        //public void Replacecmdoutput(string input)
-        //{
-        //    cmdOutput.Text = input;
-        //}
+            void cmd_Error(object sender2, DataReceivedEventArgs e)
+            {
+                Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+                {
+                    trial = e.Data;
+                    if (trial == null)
+                    {
+                        trial = "";
+                    }
+                    else
+                    {
+                        cmdOutput.Content = "Error";
+                    }
+                }));
+            }
+        }
 
         public void RegexUrl(object sender, EventArgs args)
         {
@@ -118,7 +151,8 @@ namespace ytdlgui
                     {
                         if (MessageBox.Show("Do you want to download for sure?", "Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
-                            System.Diagnostics.Process.Start("cmd.exe", $@"/C youtube-dl --ignore-errors --geo-bypass --no-playlist --extract-audio --audio-format mp3 --audio-quality 0 --embed-thumbnail --no-mtime --prefer-ffmpeg {match.Groups[1].Value} & pause");
+                            playlist = false;
+                            CmdStuff(match.Groups[1].Value, playlist);
                         }
                         else
                         {
@@ -129,7 +163,8 @@ namespace ytdlgui
                     {
                         if (MessageBox.Show("Do you want to download for sure?", "Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
-                            System.Diagnostics.Process.Start("cmd.exe", $@"/C youtube-dl --ignore-errors --geo-bypass --extract-audio --audio-format mp3 --audio-quality 0 --embed-thumbnail --no-mtime --prefer-ffmpeg {match.Groups[1].Value} & pause");
+                            playlist = true;
+                            CmdStuff(match.Groups[1].Value, playlist);
                         }
                         else
                         {
