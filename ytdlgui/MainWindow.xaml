@@ -1,0 +1,21 @@
+﻿<Window x:Class="ytdlgui.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ytdlgui"
+        mc:Ignorable="d"
+        Title="Dodgy YouTube MP3 Converter" Height="183.667" Width="330" ResizeMode="NoResize">
+    <Grid>
+        <TextBox x:Name="urlBox" Margin="10,16,0,0" Height="25" TextWrapping="Wrap" Text="Enter the url here..." VerticalAlignment="Top" HorizontalAlignment="Left" Width="292"/>
+        <Button x:Name="urlFetch" Content="Fetch" Height="25" Margin="10,46,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" Width="292"/>
+        <GroupBox Header="Settings" HorizontalAlignment="Left" Height="63" Margin="125,76,0,0" VerticalAlignment="Top" Width="177"/>
+        <StackPanel x:Name="playlistC" HorizontalAlignment="Left" Height="51" VerticalAlignment="Top" Width="104" Margin="16,82,0,0">
+            <CheckBox x:Name="correctbox" Content="Correct URL" IsEnabled="False" Height="18"/>
+            <CheckBox x:Name="playlistbox" Content="Playlist" IsEnabled="False"/>
+        </StackPanel>
+        <!--<Button x:Name="cmdBtn" Content="cmd" HorizontalAlignment="Left" Margin="177,96,0,0" VerticalAlignment="Top" Width="75" Height="25"/>-->
+        <!--<TextBox x:Name="cmdOutput" HorizontalAlignment="Left" Height="23" Margin="10,139,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="304"/>-->
+
+    </Grid>
+</Window>
