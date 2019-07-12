@@ -21,6 +21,8 @@ namespace ytdlgui
         {
             InitializeComponent();
 
+            forcePlaylist.IsChecked = forcePlaylist.IsChecked ?? false;
+
             urlBox.Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128));
 
             urlBox.GotFocus += RemoveText;
@@ -30,8 +32,8 @@ namespace ytdlgui
             urlFetch.Click += RegexUrl;
         }
 
-        
 
+        //removes placeholder
         public void RemoveText(object sender, EventArgs args)
         {
             if (urlBox.Text == Placeholder)
@@ -41,6 +43,7 @@ namespace ytdlgui
             }
         }
 
+        //adds placeholder
         public void AddText(object sender, EventArgs args)
         {
             if (string.IsNullOrWhiteSpace(urlBox.Text))
@@ -50,11 +53,11 @@ namespace ytdlgui
             }
         }
 
-        //                                                          //i thought that it would work. it works but cant give the output to an element
         public void CmdStuff(string videoID, bool pl)
         {
             cmdOutput.Content = "Processing...";
 
+            //this makes cmd run in the background
             ProcessStartInfo cmdStartInfo = new ProcessStartInfo();
             cmdStartInfo.FileName = @"C:\Windows\System32\cmd.exe";
             cmdStartInfo.RedirectStandardOutput = true;
@@ -72,18 +75,93 @@ namespace ytdlgui
             cmdProcess.BeginOutputReadLine();
             cmdProcess.BeginErrorReadLine();
 
-            if (pl == true)
+            //starts the procedure
+            if (forcePlaylist.IsChecked ?? false)
             {
-                cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --geo-bypass --extract-audio --audio-format mp3 --audio-quality 0 --embed-thumbnail --no-mtime --prefer-ffmpeg {videoID}");
+                string geo = "--no-geo-bypass";
+                if (geoBypass.IsChecked ?? false)
+                {
+                    geo = "--geo-bypass";
+                }
+
+                string tnail = "";
+                if (thumbnail.IsChecked ?? false)
+                {
+                    tnail = "--embed-thumbnail";
+                }
+
+                string mdata = "";
+                if (metadata.IsChecked ?? false)
+                {
+                    mdata = "--add-metadata";
+                }
+
+                string chDate = "--no-mtime";
+                if (changeDate.IsChecked ?? false)
+                {
+                    chDate = "";
+                }
+
+                if (urlBox.Text.ToLower().Contains("youtube") || urlBox.Text.ToLower().Contains("youtu.be"))
+                {
+                    //from stackoverflow, replaces '&'s with '^&' (i dont like regex xd)
+                    string fixedamps = Regex.Replace(urlBox.Text, @" 
+                        # Match & that is not part of an HTML entity.
+                        &                  # Match literal &.
+                        (?!                # But only if it is NOT...
+                        \w+;               # an alphanumeric entity,
+                        | \#[0-9]+;        # or a decimal entity,
+                        | \#x[0-9A-F]+;    # or a hexadecimal entity.
+                        )                  # End negative lookahead.",
+                    "^&",
+                    RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
+                    //do it!!!
+                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors {geo} --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {fixedamps}");
+                }
+                else
+                {
+                    MessageBox.Show("Please enter a valid URL!\n(This might have happened because you ticked\n\"Force Playlist\" box. Try to download the whole playlist.)");
+                }
             }
-            else if (pl == false)
+            else
             {
-                cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --geo-bypass --no-playlist --extract-audio --audio-format mp3 --audio-quality 0 --embed-thumbnail --no-mtime --prefer-ffmpeg {videoID}");
+                string geo = "--no-geo-bypass";
+                if (geoBypass.IsChecked ?? false)
+                {
+                    geo = "--geo-bypass";
+                }
+
+                string tnail = "";
+                if (thumbnail.IsChecked ?? false)
+                {
+                    tnail = "--embed-thumbnail";
+                }
+
+                string mdata = "";
+                if (metadata.IsChecked ?? false)
+                {
+                    mdata = "--add-metadata";
+                }
+
+                string chDate = "--no-mtime";
+                if (changeDate.IsChecked ?? false)
+                {
+                    chDate = "";
+                }
+
+                if (pl == true)
+                {
+                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors {geo} --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {videoID}");
+                }
+                else if (pl == false)
+                {
+                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors {geo} --no-playlist --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {videoID}");
+                }
             }
 
             void cmd_DataReceived(object sender1, DataReceivedEventArgs e)
             {
-
+                //this does the checks for the status thingie
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
                     trial = e.Data;
@@ -107,7 +185,7 @@ namespace ytdlgui
                         }
                         else if (trial.ToLower().Contains("download") == false && trial.ToLower().Contains("downloading") == true)
                         {
-                            
+
                         }
                         else if (trial.ToLower().Contains("destination:") && trial.ToLower().Contains(".mp3"))
                         {
@@ -126,14 +204,15 @@ namespace ytdlgui
                     {
                         trial = "";
                     }
-                    else
+                    else if (trial.ToLower().Contains("this playlist does not exist")) 
                     {
-                        cmdOutput.Content = "Error";
+                        cmdOutput.Content = trial;
                     }
                 }));
             }
         }
 
+        //this picks up the id's from the url
         public void RegexUrl(object sender, EventArgs args)
         {
             if (urlBox.Text == Placeholder || urlBox.Text == "")
@@ -145,6 +224,7 @@ namespace ytdlgui
                 Regex regex = new Regex(@"^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?.*?(?:v|list)=(.*?)(?:&|$)|^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?(?:(?!=).)*\/(.*)$");
                 Match match = regex.Match(urlBox.Text);
 
+                //if the match succeeded, checks the length and feeds them accordingly. 11= video id, 34= playlist id
                 if (match.Success)
                 {
                     if (match.Groups[1].Value.Length == 11)
@@ -179,11 +259,7 @@ namespace ytdlgui
             }
         }
 
-        public void CmdUrl(object sender, EventArgs args)
-        {
-
-        }
-
+        //this checks whether the entered url is a playlist url or not and checks the boxes accordingly
         public void CheckPL(object sender, EventArgs args)
         {
             Regex regex = new Regex(@"^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?.*?(?:v|list)=(.*?)(?:&|$)|^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?(?:(?!=).)*\/(.*)$");
