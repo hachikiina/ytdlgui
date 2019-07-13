@@ -28,11 +28,8 @@ namespace ytdlgui
 
             urlBox.Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128));
 
-            if (String.IsNullOrWhiteSpace(Settings.Default.directory))
-            {
-                outputPathBox.Text = Directory.GetCurrentDirectory();
+            outputPathBox.Text = Directory.GetCurrentDirectory();
 
-            }
             OnStartup();
 
             outputPath.Click += SelectPath;
