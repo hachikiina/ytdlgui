@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Ookii.Dialogs.Wpf;
+using System;
 using System.Diagnostics;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Windows;
 using System.Windows.Media;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using ytdlgui.Properties;
 
 namespace ytdlgui
 {
@@ -21,9 +23,19 @@ namespace ytdlgui
         {
             InitializeComponent();
 
-            forcePlaylist.IsChecked = forcePlaylist.IsChecked ?? false;
+            //unneeded.
+            //forcePlaylist.IsChecked = forcePlaylist.IsChecked ?? false;
 
             urlBox.Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128));
+
+            if (String.IsNullOrWhiteSpace(Settings.Default.directory))
+            {
+                outputPathBox.Text = Directory.GetCurrentDirectory();
+
+            }
+            OnStartup();
+
+            outputPath.Click += SelectPath;
 
             urlBox.GotFocus += RemoveText;
             urlBox.LostFocus += AddText;
@@ -32,6 +44,39 @@ namespace ytdlgui
             urlFetch.Click += RegexUrl;
         }
 
+        protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
+        {
+            base.OnClosing(e);
+
+            Settings.Default.directory = outputPathBox.Text;
+
+            bool forcepls = forcePlaylist.IsChecked ?? false;
+            Settings.Default.forcepl = forcepls;
+
+            bool geobps = geoBypass.IsChecked ?? false;
+            Settings.Default.geobp = geobps;
+
+            bool thumbns = thumbnail.IsChecked ?? false;
+            Settings.Default.thumbn = thumbns;
+
+            bool metas = metadata.IsChecked ?? false;
+            Settings.Default.meta = metas;
+
+            bool timestamps = changeDate.IsChecked ?? false;
+            Settings.Default.timestamp = timestamps;
+
+            Settings.Default.Save();
+        }
+
+        public void OnStartup()
+        {
+            outputPathBox.Text = Settings.Default.directory;
+            forcePlaylist.IsChecked = Settings.Default.forcepl;
+            geoBypass.IsChecked = Settings.Default.geobp;
+            thumbnail.IsChecked = Settings.Default.thumbn;
+            metadata.IsChecked = Settings.Default.meta;
+            changeDate.IsChecked = Settings.Default.timestamp;
+        }
 
         //removes placeholder
         public void RemoveText(object sender, EventArgs args)
@@ -53,18 +98,42 @@ namespace ytdlgui
             }
         }
 
+        //does the output path stuff, not to be confused with PATH
+        public void SelectPath(object sender, EventArgs args)
+        {
+            VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog
+            {
+                Description = "Please select a folder.",
+                UseDescriptionForTitle = true
+            };
+
+            if (!VistaFolderBrowserDialog.IsVistaFolderDialogSupported)
+                MessageBox.Show("Your operating system is older than Vista, falling back to old folder selector.");
+
+            if ((bool)dialog.ShowDialog(this))
+                outputPathBox.Text = dialog.SelectedPath;
+
+        }
+
+        //does the ytdl stuff
         public void CmdStuff(string videoID, bool pl)
         {
             cmdOutput.Content = "Processing...";
 
+            outputPath.IsEnabled = false;
+            outputPathBox.IsEnabled = false;
+
             //this makes cmd run in the background
-            ProcessStartInfo cmdStartInfo = new ProcessStartInfo();
-            cmdStartInfo.FileName = @"C:\Windows\System32\cmd.exe";
-            cmdStartInfo.RedirectStandardOutput = true;
-            cmdStartInfo.RedirectStandardError = true;
-            cmdStartInfo.RedirectStandardInput = true;
-            cmdStartInfo.UseShellExecute = false;
-            cmdStartInfo.CreateNoWindow = true;
+            ProcessStartInfo cmdStartInfo = new ProcessStartInfo
+            {
+                FileName = @"C:\Windows\System32\cmd.exe",
+                WorkingDirectory = $@"{outputPathBox.Text}",
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                RedirectStandardInput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
 
             Process cmdProcess = new Process();
             cmdProcess.StartInfo = cmdStartInfo;
@@ -78,6 +147,12 @@ namespace ytdlgui
             //starts the procedure
             if (forcePlaylist.IsChecked ?? false)
             {
+                //if the force playlist is checked, it passes the regex control and directly comes here (for another regex control)
+                //because the regex i used there only gets video and playlist id's,
+                //with video id's being the priority.
+                //so i had to pass the whole url for the youtube-dl to see 
+                //so it can download the playlist. duh xd
+                //this brings some problems of course, but i left youtube-dl to deal with them.
                 string geo = "--no-geo-bypass";
                 if (geoBypass.IsChecked ?? false)
                 {
@@ -86,21 +161,15 @@ namespace ytdlgui
 
                 string tnail = "";
                 if (thumbnail.IsChecked ?? false)
-                {
                     tnail = "--embed-thumbnail";
-                }
 
                 string mdata = "";
                 if (metadata.IsChecked ?? false)
-                {
                     mdata = "--add-metadata";
-                }
 
                 string chDate = "--no-mtime";
                 if (changeDate.IsChecked ?? false)
-                {
                     chDate = "";
-                }
 
                 if (urlBox.Text.ToLower().Contains("youtube") || urlBox.Text.ToLower().Contains("youtu.be"))
                 {
@@ -119,35 +188,26 @@ namespace ytdlgui
                     cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors {geo} --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {fixedamps}");
                 }
                 else
-                {
                     MessageBox.Show("Please enter a valid URL!\n(This might have happened because you ticked\n\"Force Playlist\" box. Try to download the whole playlist.)");
-                }
+
             }
             else
             {
                 string geo = "--no-geo-bypass";
                 if (geoBypass.IsChecked ?? false)
-                {
                     geo = "--geo-bypass";
-                }
 
                 string tnail = "";
                 if (thumbnail.IsChecked ?? false)
-                {
                     tnail = "--embed-thumbnail";
-                }
 
                 string mdata = "";
                 if (metadata.IsChecked ?? false)
-                {
                     mdata = "--add-metadata";
-                }
 
                 string chDate = "--no-mtime";
                 if (changeDate.IsChecked ?? false)
-                {
                     chDate = "";
-                }
 
                 if (pl == true)
                 {
@@ -164,6 +224,7 @@ namespace ytdlgui
                 //this does the checks for the status thingie
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
+                    //if it stays null it throws ArgumentNullException.
                     trial = e.Data;
                     if (trial == null)
                     {
@@ -174,6 +235,8 @@ namespace ytdlgui
                         if (trial.ToLower().Contains("adding thumbnail to"))
                         {
                             cmdOutput.Content = "Done!";
+                            outputPath.IsEnabled = true;
+                            outputPathBox.IsEnabled = true;
                         }
                         else if (trial.Contains("webpage"))
                         {
@@ -191,22 +254,48 @@ namespace ytdlgui
                         {
                             cmdOutput.Content = "Converting...";
                         }
+                        else if (trial.ToLower().Contains("deleting original file") && (!thumbnail.IsChecked ?? false))
+                        {
+                            cmdOutput.Content = "Done!";
+                            outputPath.IsEnabled = true;
+                            outputPathBox.IsEnabled = true;
+                        }
                     }
                 }));
             }
 
+            //this function catches errors from cmd
             void cmd_Error(object sender2, DataReceivedEventArgs e)
             {
                 Application.Current.Dispatcher.BeginInvoke(new Action(() =>
                 {
+                    //if it stays null it throws ArgumentNullException.
                     trial = e.Data;
                     if (trial == null)
                     {
                         trial = "";
                     }
-                    else if (trial.ToLower().Contains("this playlist does not exist")) 
+                    else if (trial.ToLower().Contains("this playlist does not exist"))
                     {
+                        //this else if in here works if the force playlist is ticked.
+                        //catches wrong playlist id's.
                         cmdOutput.Content = trial;
+                        outputPath.IsEnabled = true;
+                        outputPathBox.IsEnabled = true;
+                    }
+                    else if (trial.ToLower().Contains("this video is unavailable"))
+                    {
+                        //catches bad video id's if force playlist is checked. 
+                        cmdOutput.Content = trial;
+                        outputPath.IsEnabled = true;
+                        outputPathBox.IsEnabled = true;
+                    }
+                    else
+                    {
+                        //this catches any error thrown from anything in cmd and says error. lol
+                        cmdOutput.Content = "Error";
+                        outputPath.IsEnabled = true;
+                        outputPathBox.IsEnabled = true;
                     }
                 }));
             }
@@ -224,7 +313,7 @@ namespace ytdlgui
                 Regex regex = new Regex(@"^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?.*?(?:v|list)=(.*?)(?:&|$)|^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?(?:(?!=).)*\/(.*)$");
                 Match match = regex.Match(urlBox.Text);
 
-                //if the match succeeded, checks the length and feeds them accordingly. 11= video id, 34= playlist id
+                //if the match succeeded, checks the length and feeds them accordingly. 11 = video id, 34 = playlist id
                 if (match.Success)
                 {
                     if (match.Groups[1].Value.Length == 11)
