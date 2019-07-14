@@ -94,5 +94,41 @@ namespace ytdlgui.Properties {
                 this["timestamp"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ffmpegpath {
+            get {
+                return ((string)(this["ffmpegpath"]));
+            }
+            set {
+                this["ffmpegpath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ffmpegd {
+            get {
+                return ((bool)(this["ffmpegd"]));
+            }
+            set {
+                this["ffmpegd"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ffmpegbutton {
+            get {
+                return ((bool)(this["ffmpegbutton"]));
+            }
+            set {
+                this["ffmpegbutton"] = value;
+            }
+        }
     }
 }

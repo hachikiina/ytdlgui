@@ -8,7 +8,7 @@ using System.Windows;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("ytdlgui")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("A simple program that downloads videos\nfrom YouTube and converts them to mp3.")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("ytdlgui")]

@@ -18,10 +18,12 @@ namespace ytdlgui
     {
         private string Placeholder = "Enter the url here...";
         string trial = "";
+        string ffmpegpath = "";
         bool playlist = false;
 
         public MainWindow()
         {
+            //this integrates the ookii dll at compile
             AppDomain.CurrentDomain.AssemblyResolve += (sender, args) =>
             {
                 string resourceName = new AssemblyName(args.Name).Name + ".dll";
@@ -47,6 +49,8 @@ namespace ytdlgui
             OnStartup();
 
             outputPath.Click += SelectPath;
+            ffmpegD.Click += FFmpegCheck;
+            ffmpegButton.Click += FfmpegButton_Click;
 
             urlBox.GotFocus += RemoveText;
             urlBox.LostFocus += AddText;
@@ -55,11 +59,59 @@ namespace ytdlgui
             urlFetch.Click += RegexUrl;
         }
 
+        private void FfmpegButton_Click(object sender, RoutedEventArgs e)
+        {
+            VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog
+            {
+                Description = "Please select the ffmpeg path.",
+                UseDescriptionForTitle = true
+            };
+
+            if (!VistaFolderBrowserDialog.IsVistaFolderDialogSupported)
+                MessageBox.Show("Your operating system is older than Vista, falling back to old folder selector.");
+
+            lol:
+            if ((bool)dialog.ShowDialog(this))
+            {
+                if (File.Exists(dialog.SelectedPath + "\\ffmpeg.exe") && File.Exists(dialog.SelectedPath + "\\ffprobe.exe"))
+                {
+                    ffmpegpath = dialog.SelectedPath;
+                    ffmpegButton.ToolTip = ffmpegpath;
+                }
+                else
+                {
+                    MessageBox.Show("Please select the correct path!\nMake sure it includes ffmpeg and ffprobe.");
+                    goto lol;
+                }
+            }
+        }
+
+        private void FFmpegCheck(object sender, RoutedEventArgs e)
+        {
+            if (ffmpegD.IsChecked ?? false)
+            {
+                ffmpegButton.IsEnabled = true;
+            }
+            else
+            {
+                ffmpegButton.IsEnabled = false;
+            }
+        }
+
+        //this saves the users settings on closing
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e);
 
             Settings.Default.directory = outputPathBox.Text;
+
+            Settings.Default.ffmpegpath = ffmpegpath;
+
+            bool ffmpeglol = ffmpegD.IsChecked ?? false;
+            Settings.Default.ffmpegd = ffmpeglol;
+
+            bool ffmpegBBool = ffmpegButton.IsEnabled;
+            Settings.Default.ffmpegbutton = ffmpegBBool;
 
             bool forcepls = forcePlaylist.IsChecked ?? false;
             Settings.Default.forcepl = forcepls;
@@ -79,9 +131,14 @@ namespace ytdlgui
             Settings.Default.Save();
         }
 
+        //this loads users settings from the last session
         public void OnStartup()
         {
             outputPathBox.Text = Settings.Default.directory;
+            ffmpegpath = Settings.Default.ffmpegpath;
+            ffmpegButton.ToolTip = ffmpegpath;
+            ffmpegD.IsChecked = Settings.Default.ffmpegd;
+            ffmpegButton.IsEnabled = Settings.Default.ffmpegbutton;
             forcePlaylist.IsChecked = Settings.Default.forcepl;
             geoBypass.IsChecked = Settings.Default.geobp;
             thumbnail.IsChecked = Settings.Default.thumbn;
@@ -164,6 +221,12 @@ namespace ytdlgui
                 //so i had to pass the whole url for the youtube-dl to see 
                 //so it can download the playlist. duh xd
                 //this brings some problems of course, but i left youtube-dl to deal with them.
+                string ffmpegoutput = "";
+                if (ffmpegD.IsChecked ?? false)
+                {
+                    ffmpegoutput = $"--ffmpeg-location {ffmpegpath}";
+                }
+
                 string geo = "--no-geo-bypass";
                 if (geoBypass.IsChecked ?? false)
                 {
@@ -196,7 +259,7 @@ namespace ytdlgui
                     "^&",
                     RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
                     //do it!!!
-                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors {geo} --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {fixedamps}");
+                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --output %(title)s.%(ext)s {geo} --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {ffmpegoutput} {fixedamps}");
                 }
                 else
                     MessageBox.Show("Please enter a valid URL!\n(This might have happened because you ticked\n\"Force Playlist\" box. Try to download the whole playlist.)");
@@ -204,6 +267,12 @@ namespace ytdlgui
             }
             else
             {
+                string ffmpegoutput = "";
+                if (ffmpegD.IsChecked ?? false)
+                {
+                    ffmpegoutput = $"--ffmpeg-location {ffmpegpath}";
+                }
+
                 string geo = "--no-geo-bypass";
                 if (geoBypass.IsChecked ?? false)
                     geo = "--geo-bypass";
@@ -222,11 +291,11 @@ namespace ytdlgui
 
                 if (pl == true)
                 {
-                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors {geo} --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {videoID}");
+                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --output %(title)s.%(ext)s {geo} --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {ffmpegoutput} {videoID}");
                 }
                 else if (pl == false)
                 {
-                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors {geo} --no-playlist --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {videoID}");
+                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --output %(title)s.%(ext)s {geo} --no-playlist --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {ffmpegoutput} {videoID}");
                 }
             }
 
@@ -300,6 +369,11 @@ namespace ytdlgui
                         cmdOutput.Content = trial;
                         outputPath.IsEnabled = true;
                         outputPathBox.IsEnabled = true;
+                    }
+                    else if (trial.ToLower().Contains("is not recognized"))
+                    {
+                        cmdOutput.Content = "You dont have youtube-dl installed!";
+                        MessageBox.Show("You dont have youtube-dl installed.\nPlease install it from their github page.", "Error");
                     }
                     else
                     {
