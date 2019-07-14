@@ -36,7 +36,7 @@
                         </CheckBox.ToolTip>
                     </CheckBox>
                 </StackPanel>
-                <StackPanel Height="62" VerticalAlignment="Top" Width="90">
+                <StackPanel Height="62" VerticalAlignment="Top" Width="91">
                     <CheckBox x:Name="ffmpegD" Content="FFmpeg" Height="20" Margin="0,0,25,0">
                         <CheckBox.ToolTip>
                             <TextBlock><Run Text="Enables the option to locate FFmpeg manually."/><LineBreak /><Run Text="Check if you dont have FFmpeg installed in PATH env."/></TextBlock>

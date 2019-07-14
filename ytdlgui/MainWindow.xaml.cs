@@ -16,10 +16,10 @@ namespace ytdlgui
 
     public partial class MainWindow : Window
     {
-        private string Placeholder = "Enter the url here...";
-        string trial = "";
-        string ffmpegpath = "";
-        bool playlist = false;
+        private readonly string Placeholder = "Enter the url here...";
+        private string trial = "";
+        private string ffmpegpath = "";
+        private bool playlist = false;
 
         public MainWindow()
         {
@@ -38,9 +38,6 @@ namespace ytdlgui
             };
 
             InitializeComponent();
-
-            //unneeded.
-            //forcePlaylist.IsChecked = forcePlaylist.IsChecked ?? false;
 
             urlBox.Foreground = new SolidColorBrush(Color.FromRgb(128, 128, 128));
 
@@ -378,7 +375,8 @@ namespace ytdlgui
                     else
                     {
                         //this catches any error thrown from anything in cmd and says error. lol
-                        cmdOutput.Content = "Error";
+                        cmdOutput.Content = trial; //sometimes it wont fit :<
+                        //MessageBox.Show(trial);
                         outputPath.IsEnabled = true;
                         outputPathBox.IsEnabled = true;
                     }
