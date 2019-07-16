@@ -17,6 +17,11 @@ namespace ytdlgui
         private string Ffmpegpath { get; set; } = "";
         private bool Playlist { get; set; } = false;
 
+        /// <summary>
+        /// Called upon the "Select" button's click, opens the dialog.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void FfmpegButton_Click(object sender, RoutedEventArgs e)
         {
             VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog
@@ -44,6 +49,11 @@ namespace ytdlgui
             }
         }
 
+        /// <summary>
+        /// Checks whether the ffmpeg tick is ticked or not.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         public void FFmpegCheck(object sender, RoutedEventArgs e)
         {
             if (ffmpegD.IsChecked ?? false)
@@ -56,7 +66,10 @@ namespace ytdlgui
             }
         }
 
-        //this saves the users settings on closing
+        /// <summary>
+        /// Gets called upon closing the application.
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnClosing(System.ComponentModel.CancelEventArgs e)
         {
             base.OnClosing(e);
@@ -89,7 +102,9 @@ namespace ytdlgui
             Settings.Default.Save();
         }
 
-        //this loads users settings from the last session
+        /// <summary>
+        /// Gets called upon the start of the program, reloads the settings.
+        /// </summary>
         public void OnStartup()
         {
             outputPathBox.Text = Settings.Default.directory;
@@ -104,7 +119,11 @@ namespace ytdlgui
             changeDate.IsChecked = Settings.Default.timestamp;
         }
 
-        //removes placeholder
+        /// <summary>
+        /// Removes the placeholder text from urlBox.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         public void RemoveText(object sender, EventArgs args)
         {
             if (urlBox.Text == Placeholder)
@@ -114,7 +133,11 @@ namespace ytdlgui
             }
         }
 
-        //adds placeholder
+        /// <summary>
+        /// Adds the placeholder text to urlBox.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         public void AddText(object sender, EventArgs args)
         {
             if (string.IsNullOrWhiteSpace(urlBox.Text))
@@ -124,7 +147,11 @@ namespace ytdlgui
             }
         }
 
-        //does the output path stuff, not to be confused with PATH
+        /// <summary>
+        /// Summons a folder select dialog to set output path for youtube-dl to output files into.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         public void SelectPath(object sender, EventArgs args)
         {
             VistaFolderBrowserDialog dialog = new VistaFolderBrowserDialog
@@ -141,7 +168,11 @@ namespace ytdlgui
 
         }
 
-        //does the ytdl stuff
+        /// <summary>
+        /// Feeds the youtube url with specified settings.
+        /// </summary>
+        /// <param name="videoID"></param>
+        /// <param name="pl"></param>
         public void CmdStuff(string videoID, bool pl)
         {
             cmdOutput.Content = "Processing...";
@@ -345,7 +376,11 @@ namespace ytdlgui
             }
         }
 
-        //this picks up the id's from the url
+        /// <summary>
+        /// Seperates the video or playlist ID's from the videos.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         public void RegexUrl(object sender, EventArgs args)
         {
             if (urlBox.Text == Placeholder || urlBox.Text == "")
@@ -392,7 +427,11 @@ namespace ytdlgui
             }
         }
 
-        //this checks whether the entered url is a playlist url or not and checks the boxes accordingly
+        /// <summary>
+        /// Checks the entered URL for it being a playlist or not.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         public void CheckPL(object sender, EventArgs args)
         {
             Regex regex = new Regex(@"^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?.*?(?:v|list)=(.*?)(?:&|$)|^(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?(?:(?!=).)*\/(.*)$");
