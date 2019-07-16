@@ -5,38 +5,30 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ytdlgui"
         mc:Ignorable="d"
-        Title="Dodgy YouTube MP3 Converter" Height="256.334" Width="413.667" ResizeMode="NoResize">
+        Title="Dodgy YouTube MP3 Converter" Height="344.666" Width="416" ResizeMode="NoResize">
     <Grid>
         <TextBox x:Name="urlBox" Margin="10,16,10,0" Height="25" TextWrapping="NoWrap" Text="Enter the url here..." VerticalAlignment="Top"/>
         <Button x:Name="urlFetch" Content="Fetch" Height="25" Margin="10,46,10,0" VerticalAlignment="Top"/>
-        <GroupBox Header="Settings" Height="80" Margin="120,76,10,0" VerticalAlignment="Top">
-            <StackPanel HorizontalAlignment="Left" Height="62" Margin="0,2,-4,-6" VerticalAlignment="Top" Width="270" Orientation="Horizontal">
-                <StackPanel Height="62" VerticalAlignment="Top" Width="90">
+        <GroupBox Header="Settings" Height="140" Margin="10,94,10,0" VerticalAlignment="Top">
+            <StackPanel HorizontalAlignment="Left" Height="121" Margin="0,2,-2,-5" VerticalAlignment="Top" Width="380" Orientation="Horizontal">
+                <StackPanel Height="121" VerticalAlignment="Top" Width="95">
+                    <Label Content="File settings" FontSize="11" Padding="10,0,0,0" Height="18"/>
                     <CheckBox x:Name="forcePlaylist" Content="Force Playlist" Height="20">
                         <CheckBox.ToolTip>
-                            <TextBlock>
-                                Forces the tool to download the playlist too
-                                <LineBreak />
-                                if the URL has playlist ID after the video ID.
-                            </TextBlock>
+                            <TextBlock><Run Text="Forces the tool to download the playlist too"/><LineBreak /><Run Text="if the URL has playlist ID after the video ID."/></TextBlock>
                         </CheckBox.ToolTip>
                     </CheckBox>
                     <CheckBox x:Name="geoBypass" Content="Geo-bypass" ToolTip="Bypasses geographic restriction." Height="20" Margin="0,0,5,0"/>
                     <CheckBox x:Name="thumbnail" Content="Thumbnail" ToolTip="Embeds the thumbnail to the file." Height="20" Margin="0,0,10,0"/>
-                </StackPanel>
-                <StackPanel Height="62" VerticalAlignment="Top" Width="90">
                     <CheckBox x:Name="metadata" Content="Metadata" ToolTip="Writes metadata of the video to the file." Height="20" Margin="0,0,19,0"/>
                     <CheckBox x:Name="changeDate" Content="Change Date" Height="20">
                         <CheckBox.ToolTip>
-                            <TextBlock>
-                                Changes the files date of modification
-                                <LineBreak />
-                                to upload date of the source.
-                            </TextBlock>
+                            <TextBlock><Run Text="Changes the files date of modification"/><LineBreak /><Run Text="to upload date of the source."/></TextBlock>
                         </CheckBox.ToolTip>
                     </CheckBox>
                 </StackPanel>
-                <StackPanel Height="62" VerticalAlignment="Top" Width="91">
+                <StackPanel Height="121" VerticalAlignment="Top" Width="95">
+                    <Label Content="Miscellaneous" FontSize="11" Padding="10,0,0,0" Height="18"/>
                     <CheckBox x:Name="ffmpegD" Content="FFmpeg" Height="20" Margin="0,0,25,0">
                         <CheckBox.ToolTip>
                             <TextBlock><Run Text="Enables the option to locate FFmpeg manually."/><LineBreak /><Run Text="Check if you dont have FFmpeg installed in PATH env."/></TextBlock>
@@ -44,16 +36,19 @@
                     </CheckBox>
                     <Button x:Name="ffmpegButton" Content="Select" Height="25" Margin="5,0,15,0" IsEnabled="False"/>
                 </StackPanel>
+                <StackPanel Height="121" VerticalAlignment="Top" Width="95"/>
+                <StackPanel Height="121" VerticalAlignment="Top" Width="95"/>
             </StackPanel>
         </GroupBox>
-        <StackPanel x:Name="playlistC" HorizontalAlignment="Left" Height="51" VerticalAlignment="Top" Width="104" Margin="16,82,0,0">
-            <CheckBox x:Name="correctbox" Content="Correct URL" IsEnabled="False" Height="18"/>
-            <CheckBox x:Name="playlistbox" Content="Playlist" IsEnabled="False"/>
+        <StackPanel x:Name="playlistC" Height="22" VerticalAlignment="Top" Orientation="Horizontal" Margin="10,76,10,0">
+            <CheckBox x:Name="correctbox" Content="Correct URL" IsEnabled="False" Width="86"/>
+            <StackPanel Width="15"/>
+            <CheckBox x:Name="playlistbox" Content="Playlist" IsEnabled="False" Width="58"/>
         </StackPanel>
-        <Label x:Name="cmdOutput" Content="Enter a YouTube URL to begin." Margin="10,195,10,0" FontSize="9" Height="31" VerticalAlignment="Top"/>
-        <Label Content="Output" HorizontalAlignment="Left" Margin="16,140,0,0" VerticalAlignment="Top" FontSize="11"/>
-        <Button x:Name="outputPath" Content="Select" HorizontalAlignment="Left" Margin="10,165,0,0" VerticalAlignment="Top" Width="75" Height="25"/>
-        <TextBox x:Name="outputPathBox" Height="25" Margin="99,165,10,0" TextWrapping="NoWrap" Text="" VerticalAlignment="Top"/>
+        <Label x:Name="cmdOutput" Content="Enter a YouTube URL to begin." Margin="10,284,10,0" FontSize="9" Height="31" VerticalAlignment="Top"/>
+        <Label Content="Output" HorizontalAlignment="Left" Margin="16,229,0,0" VerticalAlignment="Top" FontSize="11"/>
+        <Button x:Name="outputPath" Content="Select" HorizontalAlignment="Left" Margin="10,254,0,0" VerticalAlignment="Top" Width="75" Height="25"/>
+        <TextBox x:Name="outputPathBox" Height="25" Margin="99,254,10,0" TextWrapping="NoWrap" Text="" VerticalAlignment="Top"/>
 
     </Grid>
 </Window>
