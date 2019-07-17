@@ -36,8 +36,22 @@
                     </CheckBox>
                     <Button x:Name="ffmpegButton" Content="Select" Height="25" Margin="5,0,15,0" IsEnabled="False"/>
                 </StackPanel>
-                <StackPanel Height="121" VerticalAlignment="Top" Width="95"/>
-                <StackPanel Height="121" VerticalAlignment="Top" Width="95"/>
+                <StackPanel Height="121" VerticalAlignment="Top" Width="95">
+                    <Label Content="Playlist options" FontSize="11" Padding="10,0,0,0" Height="18"/>
+                    <RadioButton x:Name="plReverse" Content="Reverse" ToolTip="Downloads the playlist in reverse order." Height="20" Margin="0,0,34,0"/>
+                    <RadioButton x:Name="plRandom" Content="Random" ToolTip="Downloads the playlist in random order." Height="20" Margin="0,0,28,0"/>
+                    <CheckBox x:Name="plStartNum" Content="Starting num" Height="20" Margin="0,0,6,0"/>
+                    <CheckBox x:Name="plEndNum" Content="Ending num" Height="20" Margin="0,0,10,0"/>
+                    <CheckBox x:Name="plSpecify" Content="Items" Height="20" Margin="0,0,45,0"/>
+                </StackPanel>
+                <StackPanel Height="121" VerticalAlignment="Top" Width="95">
+                    <StackPanel Height="58">
+                        <Button x:Name="plRanRevReset" Content="Reset" ToolTip="Resets the reverse/random selections." Height="25" Margin="0,22,20,0"/>
+                    </StackPanel>
+                    <TextBox x:Name="plStart" Height="20" TextWrapping="NoWrap" Text="" PreviewTextInput="NumberValidation"   Margin="0,0,20,0"/>
+                    <TextBox x:Name="plEnd" Height="20" TextWrapping="NoWrap" Text="" PreviewTextInput="NumberValidation" Margin="0,0,20,0"/>
+                    <TextBox x:Name="plItems" Height="20" TextWrapping="NoWrap" Text="" PreviewTextInput="NumberValidationv2" Margin="0,0,20,0"/>
+                </StackPanel>
             </StackPanel>
         </GroupBox>
         <StackPanel x:Name="playlistC" Height="22" VerticalAlignment="Top" Orientation="Horizontal" Margin="10,76,10,0">

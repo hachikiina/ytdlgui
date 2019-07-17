@@ -49,6 +49,12 @@ namespace ytdlgui
             ffmpegD.Click += FFmpegCheck;
             ffmpegButton.Click += FfmpegButton_Click;
 
+            plRanRevReset.Click += PlRanRevReset_Click;
+
+            plStartNum.Click += PlCheckEndStartItem;
+            plEndNum.Click += PlCheckEndStartItem;
+            plSpecify.Click += PlCheckEndStartItem;
+
             urlBox.GotFocus += RemoveText;
             urlBox.LostFocus += AddText;
             urlBox.TextChanged += CheckPL;
@@ -118,6 +124,12 @@ namespace ytdlgui
 
             Settings.Default.ffmpegpath = Ffmpegpath;
 
+            Settings.Default.StartString = plStart.Text;
+
+            Settings.Default.EndString = plEnd.Text;
+
+            Settings.Default.ItemString = plItems.Text;
+
             bool ffmpeglol = ffmpegD.IsChecked ?? false;
             Settings.Default.ffmpegd = ffmpeglol;
 
@@ -139,6 +151,21 @@ namespace ytdlgui
             bool timestamps = changeDate.IsChecked ?? false;
             Settings.Default.timestamp = timestamps;
 
+            bool startC = plStartNum.IsChecked ?? false;
+            Settings.Default.StartCheck = startC;
+
+            bool endC = plEndNum.IsChecked ?? false;
+            Settings.Default.EndCheck = endC;
+
+            bool itemC = plSpecify.IsChecked ?? false;
+            Settings.Default.ItemCheck = itemC;
+
+            bool startendE = !plSpecify.IsChecked ?? false;
+            Settings.Default.StartEndE = startendE;
+
+            bool itemE = (!plStartNum.IsChecked ?? false) && (!plEndNum.IsChecked ?? false);
+            Settings.Default.ItemE = itemE;
+
             Settings.Default.Save();
         }
 
@@ -147,6 +174,9 @@ namespace ytdlgui
         /// </summary>
         public void OnStartup()
         {
+            plStart.Text = Settings.Default.StartString;
+            plEnd.Text = Settings.Default.EndString;
+            plItems.Text = Settings.Default.ItemString;
             outputPathBox.Text = Settings.Default.directory;
             Ffmpegpath = Settings.Default.ffmpegpath;
             ffmpegButton.ToolTip = Ffmpegpath;
@@ -157,6 +187,12 @@ namespace ytdlgui
             thumbnail.IsChecked = Settings.Default.thumbn;
             metadata.IsChecked = Settings.Default.meta;
             changeDate.IsChecked = Settings.Default.timestamp;
+            plStartNum.IsChecked = Settings.Default.StartCheck;
+            plEndNum.IsChecked = Settings.Default.EndCheck;
+            plSpecify.IsChecked = Settings.Default.ItemCheck;
+            plStartNum.IsEnabled = Settings.Default.StartEndE;
+            plEndNum.IsEnabled = Settings.Default.StartEndE;
+            plSpecify.IsEnabled = Settings.Default.ItemE;
         }
 
         /// <summary>
@@ -215,6 +251,13 @@ namespace ytdlgui
         /// <param name="pl"></param>
         public void CmdStuff(string videoID, bool pl)
         {
+            //checks if any of the playlist options are checked and if they have empty strings. very long if
+            if (((plStartNum.IsChecked ?? false) && (String.IsNullOrEmpty(plStartN) || String.IsNullOrWhiteSpace(plStartN))) || ((plEndNum.IsChecked ?? false) && (String.IsNullOrEmpty(plEndN) || String.IsNullOrWhiteSpace(plEndN))) || ((plSpecify.IsChecked ?? false) && ((String.IsNullOrEmpty(plItemN) || String.IsNullOrWhiteSpace(plItemN)))))
+            {
+                MessageBox.Show("Please enter values for the:\nPlaylist Start\nPlaylist End\nor\nPlaylist Items");
+                return;
+            }
+
             cmdOutput.Content = "Processing...";
 
             outputPath.IsEnabled = false;
@@ -274,6 +317,24 @@ namespace ytdlgui
                 if (changeDate.IsChecked ?? false)
                     chDate = "";
 
+                string RevRan = "";
+                if (plReverse.IsChecked ?? false)
+                    RevRan = "--playlist-reverse";
+                else if (plRandom.IsChecked ?? false)
+                    RevRan = "--playlist-random";
+
+                string StartNumber = "";
+                if (plStartNum.IsChecked ?? false)
+                    StartNumber = "--playlist-start " + plStartN;
+
+                string EndNumber = "";
+                if (plEndNum.IsChecked ?? false)
+                    EndNumber = "--playlist-end " + plEndN;
+
+                string Items = "";
+                if (plSpecify.IsChecked ?? false)
+                    Items = "--playlist-items " + plItemN;
+
                 if (urlBox.Text.ToLower().Contains("youtube") || urlBox.Text.ToLower().Contains("youtu.be"))
                 {
                     //from stackoverflow, replaces '&'s with '^&' (i dont like regex xd)
@@ -288,7 +349,7 @@ namespace ytdlgui
                     "^&",
                     RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
                     //do it!!!
-                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --output %(title)s.%(ext)s {geo} --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {ffmpegoutput} {fixedamps}");
+                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --output %(title)s.%(ext)s {geo} --extract-audio --audio-format mp3 --audio-quality 0 {RevRan} {StartNumber} {EndNumber} {Items} {tnail} {chDate} {mdata} --prefer-ffmpeg {ffmpegoutput} {fixedamps}");
                 }
                 else
                     MessageBox.Show("Please enter a valid URL!\n(This might have happened because you ticked\n\"Force Playlist\" box. Try to download the whole playlist.)");
@@ -318,9 +379,27 @@ namespace ytdlgui
                 if (changeDate.IsChecked ?? false)
                     chDate = "";
 
+                string RevRan = "";
+                if (plReverse.IsChecked ?? false)
+                    RevRan = "--playlist-reverse";
+                else if (plRandom.IsChecked ?? false)
+                    RevRan = "--playlist-random";
+
+                string StartNumber = "";
+                if (plStartNum.IsChecked ?? false)
+                    StartNumber = "--playlist-start " + plStartN;
+
+                string EndNumber = "";
+                if (plEndNum.IsChecked ?? false)
+                    EndNumber = "--playlist-end " + plEndN;
+
+                string Items = "";
+                if (plSpecify.IsChecked ?? false)
+                    Items = "--playlist-items " + plItemN;
+
                 if (pl == true)
                 {
-                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --output %(title)s.%(ext)s {geo} --extract-audio --audio-format mp3 --audio-quality 0 {tnail} {chDate} {mdata} --prefer-ffmpeg {ffmpegoutput} {videoID}");
+                    cmdProcess.StandardInput.WriteLine($@"youtube-dl --ignore-errors --output %(title)s.%(ext)s {geo} --extract-audio --audio-format mp3 --audio-quality 0 {RevRan} {StartNumber} {EndNumber} {Items} {tnail} {chDate} {mdata} --prefer-ffmpeg {ffmpegoutput} {videoID}");
                 }
                 else if (pl == false)
                 {
@@ -423,6 +502,8 @@ namespace ytdlgui
         /// <param name="args"></param>
         public void RegexUrl(object sender, EventArgs args)
         {
+            PlCheckESI();
+
             if (urlBox.Text == Placeholder || urlBox.Text == "")
             {
                 MessageBox.Show("Please enter a URL!", "Error");
@@ -493,5 +574,104 @@ namespace ytdlgui
                 playlistbox.IsChecked = false;
             }
         }
+
+        /// <summary>
+        /// Resets the radio buttons plReset and plReverse.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        public void PlRanRevReset_Click(object sender, RoutedEventArgs e)
+        {
+            plRandom.IsChecked = false;
+            plReverse.IsChecked = false;
+        }
+
+        /// <summary>
+        /// Makes sure that you only input numbers.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NumberValidation(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9]+");
+            e.Handled = regex.IsMatch(e.Text);
+            PlCheckESI();
+        }
+
+        /// <summary>
+        /// Makes sure that you only input numbers and 2 special chars
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void NumberValidationv2(object sender, System.Windows.Input.TextCompositionEventArgs e)
+        {
+            Regex regex = new Regex("[^0-9,-]+");
+            e.Handled = regex.IsMatch(e.Text);
+            PlCheckESI();
+        }
+
+        string plStartN = "";
+        string plEndN = "";
+        string plItemN = "";
+        /// <summary>
+        /// Event handler version of PlCheckESI
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void PlCheckEndStartItem(object sender, RoutedEventArgs e)
+        {
+            PlCheckESI();
+        }
+
+        /// <summary>
+        /// Makes sure you cant select them all
+        /// </summary>
+        private void PlCheckESI()
+        {
+            if ((plStartNum.IsChecked ?? false) || (plEndNum.IsChecked ?? false))
+            {
+                plSpecify.IsEnabled = false;
+                plSpecify.IsChecked = false;
+                if (plStartNum.IsChecked ?? false)
+                {
+                    plStartN = plStart.Text;
+                }
+                else
+                {
+                    plStartN = "";
+                }
+
+                if (plEndNum.IsChecked ?? false)
+                {
+                    plEndN = plEnd.Text;
+                }
+                else
+                {
+                    plEndN = "";
+                }
+            }
+            else if ((!plStartNum.IsChecked ?? false) || (!plEndNum.IsChecked ?? false))
+            {
+                plSpecify.IsEnabled = true;
+            }
+
+            if (plSpecify.IsChecked ?? false)
+            {
+                plStartNum.IsChecked = false;
+                plStartNum.IsEnabled = false;
+                plEndNum.IsChecked = false;
+                plEndNum.IsEnabled = false;
+
+                plItemN = plItems.Text;
+            }
+            else if (!plSpecify.IsChecked ?? false)
+            {
+                plStartNum.IsEnabled = true;
+                plEndNum.IsEnabled = true;
+
+                plItemN = "";
+            }
+        }
     }
 }
+    

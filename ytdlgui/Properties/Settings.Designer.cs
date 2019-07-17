@@ -130,5 +130,101 @@ namespace ytdlgui.Properties {
                 this["ffmpegbutton"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool StartCheck {
+            get {
+                return ((bool)(this["StartCheck"]));
+            }
+            set {
+                this["StartCheck"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool EndCheck {
+            get {
+                return ((bool)(this["EndCheck"]));
+            }
+            set {
+                this["EndCheck"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ItemCheck {
+            get {
+                return ((bool)(this["ItemCheck"]));
+            }
+            set {
+                this["ItemCheck"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string StartString {
+            get {
+                return ((string)(this["StartString"]));
+            }
+            set {
+                this["StartString"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string EndString {
+            get {
+                return ((string)(this["EndString"]));
+            }
+            set {
+                this["EndString"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ItemString {
+            get {
+                return ((string)(this["ItemString"]));
+            }
+            set {
+                this["ItemString"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool StartEndE {
+            get {
+                return ((bool)(this["StartEndE"]));
+            }
+            set {
+                this["StartEndE"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ItemE {
+            get {
+                return ((bool)(this["ItemE"]));
+            }
+            set {
+                this["ItemE"] = value;
+            }
+        }
     }
 }
