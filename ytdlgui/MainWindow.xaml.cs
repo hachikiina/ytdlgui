@@ -1,17 +1,20 @@
-﻿using Ookii.Dialogs.Wpf;
+﻿#region References
+using Ookii.Dialogs.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Linq;
+using System.Windows.Threading;
 using VideoLibrary;
 using ytdlgui.Properties;
+#endregion
 
 public class UrlStuffLol
 {
@@ -65,7 +68,7 @@ namespace ytdlgui
             ffmpegButton.Click += FfmpegButton_Click;
             donwload.Click += Download_Click;
             clearlist.Click += Clearlist_Click;
-            updatebtn.Click += Updatebtn_Click;
+            deletebtn.Click += Deletebtn_Click;
 
             plRanRevReset.Click += PlRanRevReset_Click;
 
@@ -80,24 +83,30 @@ namespace ytdlgui
             urlFetch.Click += RegexUrl;
         }
 
-        private async void Updatebtn_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Deletes the selected object from the list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Deletebtn_Click(object sender, RoutedEventArgs e)
         {
-            foreach (var MyClass in items)
+            UrlStuffLol stuffLol = lvUrls.SelectedItem as UrlStuffLol;
+            if (stuffLol != null)
             {
-                var yt = YouTube.Default;
-                try
+                Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
                 {
-                    var video = await yt.GetVideoAsync(MyClass.ytTitle);
-                    MyClass.ytTitle = video.Title;
-                    lvUrls.Items.Refresh();
-                }
-                catch (InvalidOperationException)
-                {
-                    MessageBox.Show("BRUHHHHHH");
-                }
+                    items.Remove(stuffLol);
+                }));
+                lvUrls.ItemsSource = items;
+                lvUrls.Items.Refresh();
             }
         }
 
+        /// <summary>
+        /// Clears the list
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void Clearlist_Click(object sender, RoutedEventArgs e)
         {
             lvUrls.ItemsSource = null;
@@ -107,14 +116,10 @@ namespace ytdlgui
         //list stuff pls fix
         private void Download_Click(object sender, EventArgs args)
         {
-            //items.Add(new UrlStuffLol() { ytUrl = "xd", Status = "xd" });
-            //items.Add(new UrlStuffLol() { ytUrl = "xd", Status = "xd" });
             foreach (var myClass in items)
             {
-                //MessageBox.Show(myClass.ytUrl + " " + myClass.Status);
-                //myClass.Status = "lol";
                 lvUrls.Items.Refresh();
-                CmdStuff(myClass.videoID, false);
+                CmdStuff(myClass.videoID, false, true, myClass);
             }
             lvUrls.ItemsSource = items;
         }
@@ -301,11 +306,13 @@ namespace ytdlgui
         }
 
         /// <summary>
-        /// Feeds the youtube url with specified settings.
+        /// Feeds the youtube url with the specified options.
         /// </summary>
         /// <param name="videoID"></param>
         /// <param name="pl"></param>
-        public void CmdStuff(string videoID, bool pl)
+        /// <param name="fromList"></param>
+        /// <param name="stuffLol"></param>
+        public void CmdStuff(string videoID, bool pl, [Optional] bool fromList, [Optional] UrlStuffLol stuffLol)
         {
             //checks if any of the playlist options are checked and if they have empty strings. very long if
             if (((plStartNum.IsChecked ?? false) && (String.IsNullOrEmpty(plStartN) || String.IsNullOrWhiteSpace(plStartN))) || ((plEndNum.IsChecked ?? false) && (String.IsNullOrEmpty(plEndN) || String.IsNullOrWhiteSpace(plEndN))) || ((plSpecify.IsChecked ?? false) && ((String.IsNullOrEmpty(plItemN) || String.IsNullOrWhiteSpace(plItemN)))))
@@ -481,14 +488,32 @@ namespace ytdlgui
                             cmdOutput.Content = "Done!";
                             outputPath.IsEnabled = true;
                             outputPathBox.IsEnabled = true;
+                            if (fromList)
+                            {
+                                stuffLol.Status = "Done!";
+                                lvUrls.ItemsSource = items;
+                                lvUrls.Items.Refresh();
+                            }
                         }
                         else if (Trial.Contains("webpage"))
                         {
                             cmdOutput.Content = "Getting information...";
+                            if (fromList)
+                            {
+                                stuffLol.Status = "Getting information...";
+                                lvUrls.ItemsSource = items;
+                                lvUrls.Items.Refresh();
+                            }
                         }
                         else if (Trial.ToLower().Contains("download") == true && Trial.ToLower().Contains("downloading") == false)
                         {
                             cmdOutput.Content = "Downloading...";
+                            if (fromList)
+                            {
+                                stuffLol.Status = "Downloading...";
+                                lvUrls.ItemsSource = items;
+                                lvUrls.Items.Refresh();
+                            }
                         }
                         else if (Trial.ToLower().Contains("download") == false && Trial.ToLower().Contains("downloading") == true)
                         {
@@ -497,12 +522,24 @@ namespace ytdlgui
                         else if (Trial.ToLower().Contains("destination:") && Trial.ToLower().Contains(".mp3"))
                         {
                             cmdOutput.Content = "Converting...";
+                            if (fromList)
+                            {
+                                stuffLol.Status = "Converting...";
+                                lvUrls.ItemsSource = items;
+                                lvUrls.Items.Refresh();
+                            }
                         }
                         else if (Trial.ToLower().Contains("deleting original file") && (!thumbnail.IsChecked ?? false))
                         {
                             cmdOutput.Content = "Done!";
                             outputPath.IsEnabled = true;
                             outputPathBox.IsEnabled = true;
+                            if (fromList)
+                            {
+                                stuffLol.Status = "Done!";
+                                lvUrls.ItemsSource = items;
+                                lvUrls.Items.Refresh();
+                            }
                         }
                     }
                 }));
@@ -618,8 +655,6 @@ namespace ytdlgui
             {
                 correctbox.IsChecked = true;
                 playlistbox.IsChecked = false;
-                //items.Add(new UrlStuffLol() { ytUrl = "https://www.youtube.com/watch?v=" + match.Groups[1].Value, Status = "Waiting" });
-                //lvUrls.ItemsSource = items;
                 try
                 {
                     await GetVideoTitleAsync(match.Groups[1].Value, false);
@@ -633,8 +668,6 @@ namespace ytdlgui
             {
                 correctbox.IsChecked = true;
                 playlistbox.IsChecked = true;
-                //items.Add(new UrlStuffLol() { ytTitle = "Playlist" + match.Groups[1].Value, Status = "Waiting", videoID = match.Groups[1].Value });
-                //lvUrls.ItemsSource = items;
                 try
                 {
                     await GetVideoTitleAsync(match.Groups[1].Value, true);
@@ -751,7 +784,6 @@ namespace ytdlgui
 
         private async Task GetVideoTitleAsync(string videoID, bool playlist)
         {
-            //items.Add(new UrlStuffLol() {ytUrl = "Getting the title...", Status = "Waiting" });
             string titleurl = "https://www.youtube.com/watch?v=" + videoID;
 
             var youtube = YouTube.Default;
@@ -759,8 +791,6 @@ namespace ytdlgui
             if (!playlist)
             {
                 var video = await youtube.GetVideoAsync(titleurl);
-
-                //await Task.Delay(2000);
 
                 foreach (var item in items)
                     if (item.ytTitle.Contains(video.Title.Replace(" - YouTube", ""))) return;

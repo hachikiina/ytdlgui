@@ -64,7 +64,7 @@
         <Label x:Name="bruhput" Content="Output" HorizontalAlignment="Left" Margin="16,428,0,0" FontSize="11" Height="25" VerticalAlignment="Top"/>
         <Button x:Name="outputPath" Content="Select" HorizontalAlignment="Left" Margin="10,453,0,0" Width="75" Height="25" VerticalAlignment="Top"/>
         <TextBox x:Name="outputPathBox" Margin="99,453,10,0" TextWrapping="NoWrap" Text="" Height="25" VerticalAlignment="Top"/>
-        <ListView x:Name="lvUrls" Height="151" Margin="10,249,10,0" VerticalAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Hidden">
+        <ListView x:Name="lvUrls" Height="151" Margin="10,249,10,0" VerticalAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Hidden" SelectedItem="{Binding Path=SelectedItem}">
             <ListView.View>
                 <GridView>
                     <GridViewColumn Header="Video" Width="290" DisplayMemberBinding="{Binding ytTitle}"/>
@@ -72,8 +72,8 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button x:Name="donwload" Content="Download" Margin="300,411,10,0" Height="25" VerticalAlignment="Top"/>
-        <Button x:Name="clearlist" Content="Clear list" Margin="183,411,127,0" Height="25" VerticalAlignment="Top"/>
-        <Button x:Name="updatebtn" Content="Update" Margin="10,411,300,0" Height="25" VerticalAlignment="Top"/>
+        <Button x:Name="donwload" Content="Download" Margin="325,411,10,0" Height="25" VerticalAlignment="Top"/>
+        <Button x:Name="clearlist" Content="Clear list" Margin="241,411,94,0" Height="25" VerticalAlignment="Top"/>
+        <Button x:Name="deletebtn" Content="Delete" Margin="10,411,300,0" Height="25" VerticalAlignment="Top"/>
     </Grid>
 </Window>
