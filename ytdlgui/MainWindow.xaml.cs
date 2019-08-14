@@ -9,7 +9,6 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Threading;
 using VideoLibrary;
@@ -113,13 +112,17 @@ namespace ytdlgui
             items.Clear();
         }
 
-        //list stuff pls fix
+        /// <summary>
+        /// Downloads the videos from the list paralelly and synchronously
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="args"></param>
         private void Download_Click(object sender, EventArgs args)
         {
             foreach (var myClass in items)
             {
                 lvUrls.Items.Refresh();
-                CmdStuff(myClass.videoID, false, true, myClass);
+                GetAudioByID(myClass.videoID, false, true, myClass);
             }
             lvUrls.ItemsSource = items;
         }
@@ -312,7 +315,7 @@ namespace ytdlgui
         /// <param name="pl"></param>
         /// <param name="fromList"></param>
         /// <param name="stuffLol"></param>
-        public void CmdStuff(string videoID, bool pl, [Optional] bool fromList, [Optional] UrlStuffLol stuffLol)
+        public void GetAudioByID(string videoID, bool pl, [Optional] bool fromList, [Optional] UrlStuffLol stuffLol)
         {
             //checks if any of the playlist options are checked and if they have empty strings. very long if
             if (((plStartNum.IsChecked ?? false) && (String.IsNullOrEmpty(plStartN) || String.IsNullOrWhiteSpace(plStartN))) || ((plEndNum.IsChecked ?? false) && (String.IsNullOrEmpty(plEndN) || String.IsNullOrWhiteSpace(plEndN))) || ((plSpecify.IsChecked ?? false) && ((String.IsNullOrEmpty(plItemN) || String.IsNullOrWhiteSpace(plItemN)))))
@@ -614,7 +617,7 @@ namespace ytdlgui
                         if (MessageBox.Show("Do you want to download for sure?", "Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
                             Playlist = false;
-                            CmdStuff(match.Groups[1].Value, Playlist);
+                            GetAudioByID(match.Groups[1].Value, Playlist);
                         }
                         else
                         {
@@ -626,7 +629,7 @@ namespace ytdlgui
                         if (MessageBox.Show("Do you want to download for sure?", "Confirmation", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
                             Playlist = true;
-                            CmdStuff(match.Groups[1].Value, Playlist);
+                            GetAudioByID(match.Groups[1].Value, Playlist);
                         }
                         else
                         {
@@ -782,6 +785,12 @@ namespace ytdlgui
             }
         }
 
+        /// <summary>
+        /// Gets the video titles using VideoLibrary.
+        /// </summary>
+        /// <param name="videoID"></param>
+        /// <param name="playlist"></param>
+        /// <returns></returns>
         private async Task GetVideoTitleAsync(string videoID, bool playlist)
         {
             string titleurl = "https://www.youtube.com/watch?v=" + videoID;
@@ -806,51 +815,5 @@ namespace ytdlgui
                 lvUrls.Items.Refresh();
             }
         }
-    }
-}
-
-namespace FixedWidthColumn
-{
-    public class FixedWidthColumn : GridViewColumn
-    {
-        #region Constructor
-
-        static FixedWidthColumn()
-        {
-            WidthProperty.OverrideMetadata(typeof(FixedWidthColumn),
-                new FrameworkPropertyMetadata(null, new CoerceValueCallback(OnCoerceWidth)));
-        }
-
-        private static object OnCoerceWidth(DependencyObject o, object baseValue)
-        {
-            FixedWidthColumn fwc = o as FixedWidthColumn;
-            if (fwc != null)
-                return fwc.FixedWidth;
-            return 0.0;
-        }
-
-        #endregion
-
-        #region FixedWidth
-
-        public double FixedWidth
-        {
-            get { return (double)GetValue(FixedWidthProperty); }
-            set { SetValue(FixedWidthProperty, value); }
-        }
-
-        public static readonly DependencyProperty FixedWidthProperty =
-            DependencyProperty.Register("FixedWidth", typeof(double), typeof(FixedWidthColumn),
-            new FrameworkPropertyMetadata(double.NaN, new PropertyChangedCallback(OnFixedWidthChanged)));
-
-        private static void OnFixedWidthChanged(DependencyObject o, DependencyPropertyChangedEventArgs e)
-        {
-            FixedWidthColumn fwc = o as FixedWidthColumn;
-
-            if (fwc != null)
-                fwc.CoerceValue(WidthProperty);
-        }
-
-        #endregion
     }
 }

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:ytdlgui"
         xmlns:l="FixedWidthColumn"
         mc:Ignorable="d"
-        Title="Dodgy YouTube MP3 Converter" Height="543.666" Width="416" ResizeMode="NoResize">
+        Title="Dodgy YouTube MP3 Converter" Height="552.666" Width="416" ResizeMode="NoResize">
     <Grid>
         <TextBox x:Name="urlBox" Margin="10,16,10,0" Height="25" TextWrapping="NoWrap" Text="Enter the url here..." VerticalAlignment="Top"/>
         <Button x:Name="urlFetch" Content="Fetch" Height="25" Margin="10,46,10,0" VerticalAlignment="Top"/>
@@ -60,10 +60,10 @@
             <StackPanel Width="15"/>
             <CheckBox x:Name="playlistbox" Content="Playlist" IsEnabled="False" Width="58"/>
         </StackPanel>
-        <Label x:Name="cmdOutput" Content="Enter a YouTube URL to begin." Margin="10,483,10,0" FontSize="9" Height="31" VerticalAlignment="Top"/>
-        <Label x:Name="bruhput" Content="Output" HorizontalAlignment="Left" Margin="16,428,0,0" FontSize="11" Height="25" VerticalAlignment="Top"/>
-        <Button x:Name="outputPath" Content="Select" HorizontalAlignment="Left" Margin="10,453,0,0" Width="75" Height="25" VerticalAlignment="Top"/>
-        <TextBox x:Name="outputPathBox" Margin="99,453,10,0" TextWrapping="NoWrap" Text="" Height="25" VerticalAlignment="Top"/>
+        <Label x:Name="cmdOutput" Content="Enter a YouTube URL to begin." Margin="10,493,10,0" FontSize="9" Height="31" VerticalAlignment="Top"/>
+        <Label x:Name="bruhput" Content="Output" HorizontalAlignment="Left" Margin="16,438,0,0" FontSize="11" Height="25" VerticalAlignment="Top"/>
+        <Button x:Name="outputPath" Content="Select" HorizontalAlignment="Left" Margin="10,463,0,0" Width="75" Height="25" VerticalAlignment="Top"/>
+        <TextBox x:Name="outputPathBox" Margin="99,463,10,0" TextWrapping="NoWrap" Text="" Height="25" VerticalAlignment="Top"/>
         <ListView x:Name="lvUrls" Height="151" Margin="10,249,10,0" VerticalAlignment="Top" ScrollViewer.HorizontalScrollBarVisibility="Hidden" SelectedItem="{Binding Path=SelectedItem}">
             <ListView.View>
                 <GridView>
@@ -73,7 +73,7 @@
             </ListView.View>
         </ListView>
         <Button x:Name="donwload" Content="Download" Margin="325,411,10,0" Height="25" VerticalAlignment="Top"/>
-        <Button x:Name="clearlist" Content="Clear list" Margin="241,411,94,0" Height="25" VerticalAlignment="Top"/>
-        <Button x:Name="deletebtn" Content="Delete" Margin="10,411,300,0" Height="25" VerticalAlignment="Top"/>
+        <Button x:Name="clearlist" Content="Clear list" Margin="245,411,90,0" Height="25" VerticalAlignment="Top"/>
+        <Button x:Name="deletebtn" Content="Delete" Margin="165,411,170,0" Height="25" VerticalAlignment="Top"/>
     </Grid>
 </Window>
